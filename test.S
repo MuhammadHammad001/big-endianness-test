@@ -8,6 +8,7 @@ test_value:  .word 0x11223344  # Known 32-bit value
 #define MSTATUS_UBE         0x0000000000000040
 #define MSTATUSH_MBE        0x00000020
 #define MSTATUSH_SBE        0x00000010
+#define SSTATUS_UBE         0x040
 #define Umode               0x0000
 #define Smode               0x0800
 
@@ -31,6 +32,20 @@ test_value:  .word 0x11223344  # Known 32-bit value
 
     // Return from M-mode to S-mode
     mret                    # Switch to requested mode.
+.endm
+
+//Function to go to M to requested Mode.
+.macro GO_S_TO_U_MODE
+    li t2, 0x100            # SPP field mask - U mode
+    csrrc t3, sstatus, t2   # Clear SPP bits
+
+    // Set mepc to the instruction after mret
+    auipc t0, 0            # Get current PC
+    addi t0, t0, 0x10      # Compute address of instruction after mret
+    csrw sepc, t0          # Set mepc
+
+    // Return from M-mode to S-mode
+    sret                    # Switch to requested mode.
 .endm
 
 .macro RVTEST_GOTO_MMODE
@@ -59,7 +74,7 @@ TEST_SMODE_SBE:
     jal basic_instructions_disabled
     RVTEST_GOTO_MMODE
 
-TEST_SMODE_UBE:
+TEST_UMODE_UBE:
     jal enable_mstatus_ube
     GOTO_LOWER_MODE Umode
     jal basic_instructions_enabled
@@ -69,17 +84,80 @@ TEST_SMODE_UBE:
     jal basic_instructions_disabled
     RVTEST_GOTO_MMODE
 
+// The following verifies the test case in which the sstatus[UBE] is set, then user mode big endianness is enabled.
+TEST_SMODE_UBE:
+    GOTO_LOWER_MODE Smode                                                  //GO to S mode.
+    jal enable_sstatus_ube
+    GO_S_TO_U_MODE                                                         //GO to U mode.
+    jal basic_instructions_enabled
+    RVTEST_GOTO_MMODE
+    csrr t0, mstatus
+    GOTO_LOWER_MODE Smode                                                  //GO to S mode.
+    jal disable_sstatus_ube
+    GO_S_TO_U_MODE                                                         //GO to U mode.
+    jal basic_instructions_disabled
+    RVTEST_GOTO_MMODE
+
+
+//This verifies the mprv test case.
+TEST_SMODE_SBE_MPRV_CASE:
+    jal enable_mstatush_sbe
+    // Enable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, (1 << 17)        # MPRV bit (bit 17)
+    li t2, (1 << 11)        # Set MPP=01 (S-mode) to simulate S-mode memory accesses
+    or t0, t0, t1           # Enable MPRV
+    or t0, t0, t2           # Set MPP=01 (S-mode)
+    csrw mstatus, t0        # Write back to mstatus
+    jal basic_instructions_enabled
+    # Disable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, ~(1 << 17)       # Mask to clear MPRV bit
+    and t0, t0, t1          # Clear MPRV
+    csrw mstatus, t0        # Write back mstatus
+    jal disable_mstatush_sbe                                                //Disable mstatush.MBE
+    # Enable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, (1 << 17)        # MPRV bit (bit 17)
+    li t2, (1 << 11)        # Set MPP=01 (S-mode) to simulate S-mode memory accesses
+    or t0, t0, t1           # Enable MPRV
+    or t0, t0, t2           # Set MPP=01 (S-mode)
+    csrw mstatus, t0        # Write back to mstatus
+    jal basic_instructions_disabled
+    # Disable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, ~(1 << 17)       # Mask to clear MPRV bit
+    and t0, t0, t1          # Clear MPRV
+    csrw mstatus, t0        # Write back mstatus
+
+//This verifies the mprv test case.
+TEST_UMODE_UBE_MPRV_CASE:
+    jal enable_mstatus_ube
+    # Enable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, (1 << 17)        # MPRV bit (bit 17)
+    or t0, t0, t1           # Enable MPRV
+    csrw mstatus, t0        # Write back to mstatus
+    jal basic_instructions_enabled
+    # Disable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, ~(1 << 17)       # Mask to clear MPRV bit
+    and t0, t0, t1          # Clear MPRV
+    csrw mstatus, t0        # Write back mstatus
+    jal disable_mstatus_ube                                                //Disable mstatush.MBE
+    # Enable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, (1 << 17)        # MPRV bit (bit 17)
+    or t0, t0, t1           # Enable MPRV
+    csrw mstatus, t0        # Write back to mstatus
+    jal basic_instructions_disabled
+    # Disable MPRV (restore normal M-mode accesses)
+    csrr t0, mstatus        # Read mstatus
+    li t1, ~(1 << 17)       # Mask to clear MPRV bit
+    and t0, t0, t1          # Clear MPRV
+    csrw mstatus, t0        # Write back mstatus
+
     j TEST_PASS
-
-big_endian_detected:
-    # Handle big-endian case (print or signal)
-    li a7, 93       # Exit syscall
-    li a0, 0        # Exit code 0 (Big-endian detected)
-
-little_endian_detected:
-    # Handle little-endian case (print or signal)
-    li a7, 93       # Exit syscall
-    li a0, 1        # Exit code 1 (Little-endian detected)
 
 
 //Helper Functions
@@ -102,6 +180,13 @@ enable_mstatus_ube:
     csrr t1, mstatus                                                             //read back to make sure it has written the correct value.
     ret
 
+enable_sstatus_ube:
+    csrr t1, sstatus                                                             //read back to make sure it has written the correct value.
+    li t0, SSTATUS_UBE
+    csrs sstatus, t0
+    csrr t1, sstatus                                                             //read back to make sure it has written the correct value.
+    ret
+
 disable_mstatush_mbe:
     // Disable mstatush MBE bit to verify loads and stores in M-Mode.
     li t0, MSTATUSH_MBE
@@ -119,6 +204,12 @@ disable_mstatus_ube:
     li t0, MSTATUS_UBE
     csrc mstatus, t0
     csrr t1, mstatus                                                             //read back to make sure it has written the correct value.
+    ret
+
+disable_sstatus_ube:
+    li t0, SSTATUS_UBE
+    csrc sstatus, t0
+    csrr t1, sstatus                                                             //read back to make sure it has written the correct value.
     ret
 
 basic_instructions_enabled:

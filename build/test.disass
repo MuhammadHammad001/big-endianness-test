@@ -6,18 +6,18 @@ Disassembly of section .text:
 
 80000000 <_start>:
 80000000:	00000297          	auipc	t0,0x0
-80000004:	20028293          	addi	t0,t0,512 # 80000200 <trap_handler>
+80000004:	37028293          	addi	t0,t0,880 # 80000370 <trap_handler>
 80000008:	30529073          	csrw	mtvec,t0
 
 8000000c <TEST_MMODE_MBE>:
-8000000c:	0e0000ef          	jal	800000ec <enable_mstatush_mbe>
-80000010:	13c000ef          	jal	8000014c <basic_instructions_enabled>
-80000014:	108000ef          	jal	8000011c <disable_mstatush_mbe>
-80000018:	198000ef          	jal	800001b0 <basic_instructions_disabled>
+8000000c:	22c000ef          	jal	80000238 <enable_mstatush_mbe>
+80000010:	2ac000ef          	jal	800002bc <basic_instructions_enabled>
+80000014:	268000ef          	jal	8000027c <disable_mstatush_mbe>
+80000018:	308000ef          	jal	80000320 <basic_instructions_disabled>
 8000001c:	00000073          	ecall
 
 80000020 <TEST_SMODE_SBE>:
-80000020:	0dc000ef          	jal	800000fc <enable_mstatush_sbe>
+80000020:	228000ef          	jal	80000248 <enable_mstatush_sbe>
 80000024:	08000393          	li	t2,128
 80000028:	3003be73          	csrrc	t3,mstatus,t2
 8000002c:	000013b7          	lui	t2,0x1
@@ -27,9 +27,9 @@ Disassembly of section .text:
 8000003c:	01028293          	addi	t0,t0,16 # 80000048 <TEST_SMODE_SBE+0x28>
 80000040:	34129073          	csrw	mepc,t0
 80000044:	30200073          	mret
-80000048:	104000ef          	jal	8000014c <basic_instructions_enabled>
+80000048:	274000ef          	jal	800002bc <basic_instructions_enabled>
 8000004c:	00000073          	ecall
-80000050:	0dc000ef          	jal	8000012c <disable_mstatush_sbe>
+80000050:	23c000ef          	jal	8000028c <disable_mstatush_sbe>
 80000054:	08000393          	li	t2,128
 80000058:	3003be73          	csrrc	t3,mstatus,t2
 8000005c:	000013b7          	lui	t2,0x1
@@ -39,160 +39,258 @@ Disassembly of section .text:
 8000006c:	01028293          	addi	t0,t0,16 # 80000078 <TEST_SMODE_SBE+0x58>
 80000070:	34129073          	csrw	mepc,t0
 80000074:	30200073          	mret
-80000078:	138000ef          	jal	800001b0 <basic_instructions_disabled>
+80000078:	2a8000ef          	jal	80000320 <basic_instructions_disabled>
 8000007c:	00000073          	ecall
 
-80000080 <TEST_SMODE_UBE>:
-80000080:	08c000ef          	jal	8000010c <enable_mstatus_ube>
+80000080 <TEST_UMODE_UBE>:
+80000080:	1d8000ef          	jal	80000258 <enable_mstatus_ube>
 80000084:	08000393          	li	t2,128
 80000088:	3003be73          	csrrc	t3,mstatus,t2
 8000008c:	00000393          	li	t2,0
 80000090:	3003a073          	csrs	mstatus,t2
 80000094:	00000297          	auipc	t0,0x0
-80000098:	01028293          	addi	t0,t0,16 # 800000a4 <TEST_SMODE_UBE+0x24>
+80000098:	01028293          	addi	t0,t0,16 # 800000a4 <TEST_UMODE_UBE+0x24>
 8000009c:	34129073          	csrw	mepc,t0
 800000a0:	30200073          	mret
-800000a4:	0a8000ef          	jal	8000014c <basic_instructions_enabled>
+800000a4:	218000ef          	jal	800002bc <basic_instructions_enabled>
 800000a8:	00000073          	ecall
-800000ac:	090000ef          	jal	8000013c <disable_mstatus_ube>
+800000ac:	1f0000ef          	jal	8000029c <disable_mstatus_ube>
 800000b0:	08000393          	li	t2,128
 800000b4:	3003be73          	csrrc	t3,mstatus,t2
 800000b8:	00000393          	li	t2,0
 800000bc:	3003a073          	csrs	mstatus,t2
 800000c0:	00000297          	auipc	t0,0x0
-800000c4:	01028293          	addi	t0,t0,16 # 800000d0 <TEST_SMODE_UBE+0x50>
+800000c4:	01028293          	addi	t0,t0,16 # 800000d0 <TEST_UMODE_UBE+0x50>
 800000c8:	34129073          	csrw	mepc,t0
 800000cc:	30200073          	mret
-800000d0:	0e0000ef          	jal	800001b0 <basic_instructions_disabled>
+800000d0:	250000ef          	jal	80000320 <basic_instructions_disabled>
 800000d4:	00000073          	ecall
-800000d8:	1780006f          	j	80000250 <TEST_PASS>
 
-800000dc <big_endian_detected>:
-800000dc:	05d00893          	li	a7,93
-800000e0:	00000513          	li	a0,0
+800000d8 <TEST_SMODE_UBE>:
+800000d8:	08000393          	li	t2,128
+800000dc:	3003be73          	csrrc	t3,mstatus,t2
+800000e0:	000013b7          	lui	t2,0x1
+800000e4:	80038393          	addi	t2,t2,-2048 # 800 <_start-0x7ffff800>
+800000e8:	3003a073          	csrs	mstatus,t2
+800000ec:	00000297          	auipc	t0,0x0
+800000f0:	01028293          	addi	t0,t0,16 # 800000fc <TEST_SMODE_UBE+0x24>
+800000f4:	34129073          	csrw	mepc,t0
+800000f8:	30200073          	mret
+800000fc:	16c000ef          	jal	80000268 <enable_sstatus_ube>
+80000100:	10000393          	li	t2,256
+80000104:	1003be73          	csrrc	t3,sstatus,t2
+80000108:	00000297          	auipc	t0,0x0
+8000010c:	01028293          	addi	t0,t0,16 # 80000118 <TEST_SMODE_UBE+0x40>
+80000110:	14129073          	csrw	sepc,t0
+80000114:	10200073          	sret
+80000118:	1a4000ef          	jal	800002bc <basic_instructions_enabled>
+8000011c:	00000073          	ecall
+80000120:	300022f3          	csrr	t0,mstatus
+80000124:	08000393          	li	t2,128
+80000128:	3003be73          	csrrc	t3,mstatus,t2
+8000012c:	000013b7          	lui	t2,0x1
+80000130:	80038393          	addi	t2,t2,-2048 # 800 <_start-0x7ffff800>
+80000134:	3003a073          	csrs	mstatus,t2
+80000138:	00000297          	auipc	t0,0x0
+8000013c:	01028293          	addi	t0,t0,16 # 80000148 <TEST_SMODE_UBE+0x70>
+80000140:	34129073          	csrw	mepc,t0
+80000144:	30200073          	mret
+80000148:	164000ef          	jal	800002ac <disable_sstatus_ube>
+8000014c:	10000393          	li	t2,256
+80000150:	1003be73          	csrrc	t3,sstatus,t2
+80000154:	00000297          	auipc	t0,0x0
+80000158:	01028293          	addi	t0,t0,16 # 80000164 <TEST_SMODE_UBE+0x8c>
+8000015c:	14129073          	csrw	sepc,t0
+80000160:	10200073          	sret
+80000164:	1bc000ef          	jal	80000320 <basic_instructions_disabled>
+80000168:	00000073          	ecall
 
-800000e4 <little_endian_detected>:
-800000e4:	05d00893          	li	a7,93
-800000e8:	00100513          	li	a0,1
+8000016c <TEST_SMODE_SBE_MPRV_CASE>:
+8000016c:	0dc000ef          	jal	80000248 <enable_mstatush_sbe>
+80000170:	300022f3          	csrr	t0,mstatus
+80000174:	00020337          	lui	t1,0x20
+80000178:	000013b7          	lui	t2,0x1
+8000017c:	80038393          	addi	t2,t2,-2048 # 800 <_start-0x7ffff800>
+80000180:	0062e2b3          	or	t0,t0,t1
+80000184:	0072e2b3          	or	t0,t0,t2
+80000188:	30029073          	csrw	mstatus,t0
+8000018c:	130000ef          	jal	800002bc <basic_instructions_enabled>
+80000190:	300022f3          	csrr	t0,mstatus
+80000194:	fffe0337          	lui	t1,0xfffe0
+80000198:	fff30313          	addi	t1,t1,-1 # fffdffff <_data_end+0x7ffdefdb>
+8000019c:	0062f2b3          	and	t0,t0,t1
+800001a0:	30029073          	csrw	mstatus,t0
+800001a4:	0e8000ef          	jal	8000028c <disable_mstatush_sbe>
+800001a8:	300022f3          	csrr	t0,mstatus
+800001ac:	00020337          	lui	t1,0x20
+800001b0:	000013b7          	lui	t2,0x1
+800001b4:	80038393          	addi	t2,t2,-2048 # 800 <_start-0x7ffff800>
+800001b8:	0062e2b3          	or	t0,t0,t1
+800001bc:	0072e2b3          	or	t0,t0,t2
+800001c0:	30029073          	csrw	mstatus,t0
+800001c4:	15c000ef          	jal	80000320 <basic_instructions_disabled>
+800001c8:	300022f3          	csrr	t0,mstatus
+800001cc:	fffe0337          	lui	t1,0xfffe0
+800001d0:	fff30313          	addi	t1,t1,-1 # fffdffff <_data_end+0x7ffdefdb>
+800001d4:	0062f2b3          	and	t0,t0,t1
+800001d8:	30029073          	csrw	mstatus,t0
 
-800000ec <enable_mstatush_mbe>:
-800000ec:	02000293          	li	t0,32
-800000f0:	3102a073          	csrs	0x310,t0
-800000f4:	31002373          	csrr	t1,0x310
-800000f8:	00008067          	ret
+800001dc <TEST_UMODE_UBE_MPRV_CASE>:
+800001dc:	07c000ef          	jal	80000258 <enable_mstatus_ube>
+800001e0:	300022f3          	csrr	t0,mstatus
+800001e4:	00020337          	lui	t1,0x20
+800001e8:	0062e2b3          	or	t0,t0,t1
+800001ec:	30029073          	csrw	mstatus,t0
+800001f0:	0cc000ef          	jal	800002bc <basic_instructions_enabled>
+800001f4:	300022f3          	csrr	t0,mstatus
+800001f8:	fffe0337          	lui	t1,0xfffe0
+800001fc:	fff30313          	addi	t1,t1,-1 # fffdffff <_data_end+0x7ffdefdb>
+80000200:	0062f2b3          	and	t0,t0,t1
+80000204:	30029073          	csrw	mstatus,t0
+80000208:	094000ef          	jal	8000029c <disable_mstatus_ube>
+8000020c:	300022f3          	csrr	t0,mstatus
+80000210:	00020337          	lui	t1,0x20
+80000214:	0062e2b3          	or	t0,t0,t1
+80000218:	30029073          	csrw	mstatus,t0
+8000021c:	104000ef          	jal	80000320 <basic_instructions_disabled>
+80000220:	300022f3          	csrr	t0,mstatus
+80000224:	fffe0337          	lui	t1,0xfffe0
+80000228:	fff30313          	addi	t1,t1,-1 # fffdffff <_data_end+0x7ffdefdb>
+8000022c:	0062f2b3          	and	t0,t0,t1
+80000230:	30029073          	csrw	mstatus,t0
+80000234:	18c0006f          	j	800003c0 <TEST_PASS>
 
-800000fc <enable_mstatush_sbe>:
-800000fc:	01000293          	li	t0,16
-80000100:	3102a073          	csrs	0x310,t0
-80000104:	31002373          	csrr	t1,0x310
-80000108:	00008067          	ret
+80000238 <enable_mstatush_mbe>:
+80000238:	02000293          	li	t0,32
+8000023c:	3102a073          	csrs	0x310,t0
+80000240:	31002373          	csrr	t1,0x310
+80000244:	00008067          	ret
 
-8000010c <enable_mstatus_ube>:
-8000010c:	04000293          	li	t0,64
-80000110:	3002a073          	csrs	mstatus,t0
-80000114:	30002373          	csrr	t1,mstatus
-80000118:	00008067          	ret
+80000248 <enable_mstatush_sbe>:
+80000248:	01000293          	li	t0,16
+8000024c:	3102a073          	csrs	0x310,t0
+80000250:	31002373          	csrr	t1,0x310
+80000254:	00008067          	ret
 
-8000011c <disable_mstatush_mbe>:
-8000011c:	02000293          	li	t0,32
-80000120:	3102b073          	csrc	0x310,t0
-80000124:	31002373          	csrr	t1,0x310
-80000128:	00008067          	ret
+80000258 <enable_mstatus_ube>:
+80000258:	04000293          	li	t0,64
+8000025c:	3002a073          	csrs	mstatus,t0
+80000260:	30002373          	csrr	t1,mstatus
+80000264:	00008067          	ret
 
-8000012c <disable_mstatush_sbe>:
-8000012c:	01000293          	li	t0,16
-80000130:	3102b073          	csrc	0x310,t0
-80000134:	31002373          	csrr	t1,0x310
-80000138:	00008067          	ret
+80000268 <enable_sstatus_ube>:
+80000268:	10002373          	csrr	t1,sstatus
+8000026c:	04000293          	li	t0,64
+80000270:	1002a073          	csrs	sstatus,t0
+80000274:	10002373          	csrr	t1,sstatus
+80000278:	00008067          	ret
 
-8000013c <disable_mstatus_ube>:
-8000013c:	04000293          	li	t0,64
-80000140:	3002b073          	csrc	mstatus,t0
-80000144:	30002373          	csrr	t1,mstatus
-80000148:	00008067          	ret
+8000027c <disable_mstatush_mbe>:
+8000027c:	02000293          	li	t0,32
+80000280:	3102b073          	csrc	0x310,t0
+80000284:	31002373          	csrr	t1,0x310
+80000288:	00008067          	ret
 
-8000014c <basic_instructions_enabled>:
-8000014c:	123452b7          	lui	t0,0x12345
-80000150:	67828293          	addi	t0,t0,1656 # 12345678 <_start-0x6dcba988>
-80000154:	00000317          	auipc	t1,0x0
-80000158:	0dc30313          	addi	t1,t1,220 # 80000230 <rvtest_data>
-8000015c:	00530023          	sb	t0,0(t1)
-80000160:	00531223          	sh	t0,4(t1)
-80000164:	00532423          	sw	t0,8(t1)
-80000168:	00830283          	lb	t0,8(t1)
-8000016c:	00831283          	lh	t0,8(t1)
-80000170:	00832283          	lw	t0,8(t1)
-80000174:	00834283          	lbu	t0,8(t1)
-80000178:	00835283          	lhu	t0,8(t1)
-8000017c:	ff3452b7          	lui	t0,0xff345
-80000180:	67828293          	addi	t0,t0,1656 # ff345678 <_data_end+0x7f344654>
-80000184:	00000397          	auipc	t2,0x0
-80000188:	0b838393          	addi	t2,t2,184 # 8000023c <rvtest_data1>
-8000018c:	00538023          	sb	t0,0(t2)
-80000190:	00539223          	sh	t0,4(t2)
-80000194:	0053a423          	sw	t0,8(t2)
-80000198:	00838283          	lb	t0,8(t2)
-8000019c:	00839283          	lh	t0,8(t2)
-800001a0:	0083a283          	lw	t0,8(t2)
-800001a4:	0083c283          	lbu	t0,8(t2)
-800001a8:	0083d283          	lhu	t0,8(t2)
-800001ac:	00008067          	ret
+8000028c <disable_mstatush_sbe>:
+8000028c:	01000293          	li	t0,16
+80000290:	3102b073          	csrc	0x310,t0
+80000294:	31002373          	csrr	t1,0x310
+80000298:	00008067          	ret
 
-800001b0 <basic_instructions_disabled>:
-800001b0:	00000317          	auipc	t1,0x0
-800001b4:	08030313          	addi	t1,t1,128 # 80000230 <rvtest_data>
-800001b8:	00000397          	auipc	t2,0x0
-800001bc:	08438393          	addi	t2,t2,132 # 8000023c <rvtest_data1>
-800001c0:	00830283          	lb	t0,8(t1)
-800001c4:	00831283          	lh	t0,8(t1)
-800001c8:	00832283          	lw	t0,8(t1)
-800001cc:	00834283          	lbu	t0,8(t1)
-800001d0:	00835283          	lhu	t0,8(t1)
-800001d4:	00838283          	lb	t0,8(t2)
-800001d8:	00839283          	lh	t0,8(t2)
-800001dc:	0083a283          	lw	t0,8(t2)
-800001e0:	0083c283          	lbu	t0,8(t2)
-800001e4:	0083d283          	lhu	t0,8(t2)
-800001e8:	ff3452b7          	lui	t0,0xff345
-800001ec:	67828293          	addi	t0,t0,1656 # ff345678 <_data_end+0x7f344654>
-800001f0:	00530023          	sb	t0,0(t1)
-800001f4:	00531223          	sh	t0,4(t1)
-800001f8:	00532423          	sw	t0,8(t1)
-800001fc:	00008067          	ret
+8000029c <disable_mstatus_ube>:
+8000029c:	04000293          	li	t0,64
+800002a0:	3002b073          	csrc	mstatus,t0
+800002a4:	30002373          	csrr	t1,mstatus
+800002a8:	00008067          	ret
 
-80000200 <trap_handler>:
-80000200:	300022f3          	csrr	t0,mstatus
-80000204:	ffffe337          	lui	t1,0xffffe
-80000208:	7ff30313          	addi	t1,t1,2047 # ffffe7ff <_data_end+0x7fffd7db>
-8000020c:	0062f2b3          	and	t0,t0,t1
-80000210:	00002337          	lui	t1,0x2
-80000214:	80030313          	addi	t1,t1,-2048 # 1800 <_start-0x7fffe800>
-80000218:	0062e2b3          	or	t0,t0,t1
-8000021c:	30029073          	csrw	mstatus,t0
-80000220:	341022f3          	csrr	t0,mepc
-80000224:	00428293          	addi	t0,t0,4
-80000228:	34129073          	csrw	mepc,t0
-8000022c:	30200073          	mret
+800002ac <disable_sstatus_ube>:
+800002ac:	04000293          	li	t0,64
+800002b0:	1002b073          	csrc	sstatus,t0
+800002b4:	10002373          	csrr	t1,sstatus
+800002b8:	00008067          	ret
 
-80000230 <rvtest_data>:
+800002bc <basic_instructions_enabled>:
+800002bc:	123452b7          	lui	t0,0x12345
+800002c0:	67828293          	addi	t0,t0,1656 # 12345678 <_start-0x6dcba988>
+800002c4:	00000317          	auipc	t1,0x0
+800002c8:	0dc30313          	addi	t1,t1,220 # 800003a0 <rvtest_data>
+800002cc:	00530023          	sb	t0,0(t1)
+800002d0:	00531223          	sh	t0,4(t1)
+800002d4:	00532423          	sw	t0,8(t1)
+800002d8:	00830283          	lb	t0,8(t1)
+800002dc:	00831283          	lh	t0,8(t1)
+800002e0:	00832283          	lw	t0,8(t1)
+800002e4:	00834283          	lbu	t0,8(t1)
+800002e8:	00835283          	lhu	t0,8(t1)
+800002ec:	ff3452b7          	lui	t0,0xff345
+800002f0:	67828293          	addi	t0,t0,1656 # ff345678 <_data_end+0x7f344654>
+800002f4:	00000397          	auipc	t2,0x0
+800002f8:	0b838393          	addi	t2,t2,184 # 800003ac <rvtest_data1>
+800002fc:	00538023          	sb	t0,0(t2)
+80000300:	00539223          	sh	t0,4(t2)
+80000304:	0053a423          	sw	t0,8(t2)
+80000308:	00838283          	lb	t0,8(t2)
+8000030c:	00839283          	lh	t0,8(t2)
+80000310:	0083a283          	lw	t0,8(t2)
+80000314:	0083c283          	lbu	t0,8(t2)
+80000318:	0083d283          	lhu	t0,8(t2)
+8000031c:	00008067          	ret
+
+80000320 <basic_instructions_disabled>:
+80000320:	00000317          	auipc	t1,0x0
+80000324:	08030313          	addi	t1,t1,128 # 800003a0 <rvtest_data>
+80000328:	00000397          	auipc	t2,0x0
+8000032c:	08438393          	addi	t2,t2,132 # 800003ac <rvtest_data1>
+80000330:	00830283          	lb	t0,8(t1)
+80000334:	00831283          	lh	t0,8(t1)
+80000338:	00832283          	lw	t0,8(t1)
+8000033c:	00834283          	lbu	t0,8(t1)
+80000340:	00835283          	lhu	t0,8(t1)
+80000344:	00838283          	lb	t0,8(t2)
+80000348:	00839283          	lh	t0,8(t2)
+8000034c:	0083a283          	lw	t0,8(t2)
+80000350:	0083c283          	lbu	t0,8(t2)
+80000354:	0083d283          	lhu	t0,8(t2)
+80000358:	ff3452b7          	lui	t0,0xff345
+8000035c:	67828293          	addi	t0,t0,1656 # ff345678 <_data_end+0x7f344654>
+80000360:	00530023          	sb	t0,0(t1)
+80000364:	00531223          	sh	t0,4(t1)
+80000368:	00532423          	sw	t0,8(t1)
+8000036c:	00008067          	ret
+
+80000370 <trap_handler>:
+80000370:	300022f3          	csrr	t0,mstatus
+80000374:	ffffe337          	lui	t1,0xffffe
+80000378:	7ff30313          	addi	t1,t1,2047 # ffffe7ff <_data_end+0x7fffd7db>
+8000037c:	0062f2b3          	and	t0,t0,t1
+80000380:	00002337          	lui	t1,0x2
+80000384:	80030313          	addi	t1,t1,-2048 # 1800 <_start-0x7fffe800>
+80000388:	0062e2b3          	or	t0,t0,t1
+8000038c:	30029073          	csrw	mstatus,t0
+80000390:	341022f3          	csrr	t0,mepc
+80000394:	00428293          	addi	t0,t0,4
+80000398:	34129073          	csrw	mepc,t0
+8000039c:	30200073          	mret
+
+800003a0 <rvtest_data>:
 	...
 
-8000023c <rvtest_data1>:
+800003ac <rvtest_data1>:
 	...
 
-80000248 <TEST_FAIL>:
-80000248:	00000513          	li	a0,0
-8000024c:	00c0006f          	j	80000258 <exit>
+800003b8 <TEST_FAIL>:
+800003b8:	00000513          	li	a0,0
+800003bc:	00c0006f          	j	800003c8 <exit>
 
-80000250 <TEST_PASS>:
-80000250:	00100513          	li	a0,1
-80000254:	0040006f          	j	80000258 <exit>
+800003c0 <TEST_PASS>:
+800003c0:	00100513          	li	a0,1
+800003c4:	0040006f          	j	800003c8 <exit>
 
-80000258 <exit>:
-80000258:	00001f17          	auipc	t5,0x1
-8000025c:	db8f0f13          	addi	t5,t5,-584 # 80001010 <tohost>
-80000260:	00af2023          	sw	a0,0(t5)
-80000264:	ff5ff06f          	j	80000258 <exit>
+800003c8 <exit>:
+800003c8:	00001f17          	auipc	t5,0x1
+800003cc:	c48f0f13          	addi	t5,t5,-952 # 80001010 <tohost>
+800003d0:	00af2023          	sw	a0,0(t5)
+800003d4:	ff5ff06f          	j	800003c8 <exit>
 
 Disassembly of section .data:
 
